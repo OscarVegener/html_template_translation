@@ -18,21 +18,27 @@ def add_translate_tag_to_html(file_path, backup=False):
         fp.write(str(soup.prettify()))
 
 
-def get_list_of_html_files(dir, file_list=[]):
+def get_list_of_html_files(dir, file_list=[], recursive=False):
     entries = os.scandir(dir)
-    for entry in entries:
-        if entry.is_file() and entry.name.endswith(".html"):
-            file_list.append(entry.path)
-        elif entry.is_dir():
-            get_list_of_html_files(entry, file_list=file_list)
+    if recursive:
+        for entry in entries:
+            if entry.is_file() and entry.name.endswith(".html"):
+                file_list.append(entry.path)
+            elif entry.is_dir():
+                get_list_of_html_files(entry, file_list=file_list, recursive=True)
     
-    return file_list
-
+        return file_list
+    else:
+        for entry in entries:
+             if entry.is_file() and entry.name.endswith(".html"):
+                file_list.append(entry.path)
+        return file_list
 
 def main(opt):
-    with open(opt.logging, "a") as file:
-        file.truncate()
-    lst = get_list_of_html_files(opt.directory)
+    if opt.logging:
+        with open(opt.logging, "a") as file:
+            file.truncate()
+    lst = get_list_of_html_files(dir=opt.directory, recursive=opt.recursive)
     print("List of html files:")
     print("==========================================")
     for item in lst:
