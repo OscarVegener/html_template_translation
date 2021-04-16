@@ -12,7 +12,7 @@ def add_translate_tag_to_html(file_path, backup=False):
     
     filtered_texts = [text for text in texts if not re.match(r'{%.*%}', text.string.strip()) and not re.match(r'{{.*}}', text.string.strip()) and text.string.strip()]
     for text in filtered_texts:
-        text.replace_with(text.replace(text, "{{% translate {} %}}".format(text)))
+        text.replace_with(text.replace(text, '{{% translate "{}" %}}'.format(text)))
 
     with open(file_path, 'w') as fp:
         fp.write(str(soup.prettify()))
