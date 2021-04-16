@@ -18,11 +18,13 @@ def add_translate_tag_to_html(file_path, backup=False):
         fp.write(str(soup.prettify()))
 
 
-def get_list_of_html_files(dir, file_list=[], recursive=False):
+def get_list_of_html_files(dir, file_list=[], recursive=False, subdirectories_only=".*"):
     entries = os.scandir(dir)
+    pattern = '.*/{}/.*'.format(subdirectories_only)
     if recursive:
         for entry in entries:
-            if entry.is_file() and entry.name.endswith(".html"):
+            
+            if entry.is_file() and entry.name.endswith(".html") and re.match(r'.*/templates/.*', entry.path):
                 file_list.append(entry.path)
             elif entry.is_dir():
                 get_list_of_html_files(entry, file_list=file_list, recursive=True)
@@ -38,7 +40,11 @@ def main(opt):
     if opt.logging:
         with open(opt.logging, "a") as file:
             file.truncate()
-    lst = get_list_of_html_files(dir=opt.directory, recursive=opt.recursive)
+    if opt.subdirectoriesonly:
+        subdirectories_only = opt.subdirectoriesonly
+    else:
+        subdirectories_only = ".*"
+    lst = get_list_of_html_files(dir=opt.directory, recursive=opt.recursive, subdirectories_only=subdirectories_only)
     print("List of html files:")
     print("==========================================")
     for item in lst:
@@ -64,6 +70,7 @@ if __name__ == "__main__":
     parser.add_argument('-r', '--recursive', help="Look for html files in subdirectories", action="store_true")
     parser.add_argument('-b', '--backup', help="Make backup of html files", action="store_true")
     parser.add_argument('-l', '--logging', type=str, help="Save exceptions to file")
+    parser.add_argument('-s', '--subdirectoriesonly', type=str, help="Search for html files in specified subdirectories only")
 
     opt = parser.parse_args()
     main(opt)
