@@ -14,8 +14,9 @@ def add_translate_tag_to_html(file_path, backup=False):
     for text in filtered_texts:
         text.replace_with(text.replace(text, "{{% translate '{}' %}}".format(text)))
 
+    str_html = "{% load i18n %}" + str(soup.prettify())
     with open(file_path, 'w') as fp:
-        fp.write(str(soup.prettify()))
+        fp.write(str_html)
 
 
 def get_list_of_html_files(dir, file_list=[], recursive=False, subdirectories_only=".*"):
